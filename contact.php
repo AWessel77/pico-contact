@@ -52,40 +52,41 @@ class Contact {
 					}
 				}
 			}
-		}
-		// No validation validation, proceed sending the email.
-		if (count($this->validation) == 0) {
-			$mail = new \PHPMailer;
-			if (isset($this->contact['smtp'])) {
-				$mail->isSMTP();
-				$mail->Host = $this->contact['smtp']['host'] ? $this->contact['smtp']['host'] : '';
-				$mail->SMTPAuth = $this->contact['smtp']['auth'] ? $this->contact['smtp']['auth'] : '';
-				$mail->Username = $this->contact['smtp']['username'] ? $this->contact['smtp']['username'] : '';
-				$mail->Password = $this->contact['smtp']['password'] ? $this->contact['smtp']['password'] : '';
-				$mail->SMTPSecure = $this->contact['smtp']['encryption'] ? $this->contact['smtp']['encryption'] : '';
-				$mail->Port = $this->contact['smtp']['port'] ? $this->contact['smtp']['port'] : '';
-			}
-			$mail->CharSet = "UTF-8";
-			$mail->FromName = $this->post['name'];
-			$mail->From = $this->post['mail'];
-			$mail->addAddress($this->contact['send_to']);
-			$subject = isset($this->post['subject']) ? $this->post['subject'] : '';
-			$args = array($this->post['name'], $this->post['mail'], $subject, $settings['site_title'], $settings['base_url']);
-			$header = isset($this->contact['body_header']) ? vsprintf($this->contact['body_header'], $args) : '';
-			$footer = isset($this->contact['body_footer']) ? vsprintf($this->contact['body_footer'], $args) : '';
-			if (isset($this->contact['subject'])) {
-				$mail->Subject = vsprintf($this->contact['subject'], $args);
-			} elseif ($subject != '') {
-				$mail->Subject = $this->post['subject'];
-			}
-			$mail->Body = $header.$this->post['message'].$footer;
 			
-			if(!$mail->send()) {
-				// Try to use SMTP if you'll get here.
-				$this->error = isset($mail->validationInfo) ? $mail->validationInfo : 'Unknown mailing error.';
-			} else {
-				$this->post = false;
-				$this->message = true;
+			// No validation validation, proceed sending the email.
+			if (count($this->validation) == 0) {
+				$mail = new \PHPMailer;
+				if (isset($this->contact['smtp'])) {
+					$mail->isSMTP();
+					$mail->Host = $this->contact['smtp']['host'] ? $this->contact['smtp']['host'] : '';
+					$mail->SMTPAuth = $this->contact['smtp']['auth'] ? $this->contact['smtp']['auth'] : '';
+					$mail->Username = $this->contact['smtp']['username'] ? $this->contact['smtp']['username'] : '';
+					$mail->Password = $this->contact['smtp']['password'] ? $this->contact['smtp']['password'] : '';
+					$mail->SMTPSecure = $this->contact['smtp']['encryption'] ? $this->contact['smtp']['encryption'] : '';
+					$mail->Port = $this->contact['smtp']['port'] ? $this->contact['smtp']['port'] : '';
+				}
+				$mail->CharSet = "UTF-8";
+				$mail->FromName = $this->post['name'];
+				$mail->From = $this->post['mail'];
+				$mail->addAddress($this->contact['send_to']);
+				$subject = isset($this->post['subject']) ? $this->post['subject'] : '';
+				$args = array($this->post['name'], $this->post['mail'], $subject, $settings['site_title'], $settings['base_url']);
+				$header = isset($this->contact['body_header']) ? vsprintf($this->contact['body_header'], $args) : '';
+				$footer = isset($this->contact['body_footer']) ? vsprintf($this->contact['body_footer'], $args) : '';
+				if (isset($this->contact['subject'])) {
+					$mail->Subject = vsprintf($this->contact['subject'], $args);
+				} elseif ($subject != '') {
+					$mail->Subject = $this->post['subject'];
+				}
+				$mail->Body = $header.$this->post['message'].$footer;
+				
+				if(!$mail->send()) {
+					// Try to use SMTP if you'll get here.
+					$this->error = isset($mail->validationInfo) ? $mail->validationInfo : 'Unknown mailing error.';
+				} else {
+					$this->post = false;
+					$this->message = true;
+				}
 			}
 		}
 	}
